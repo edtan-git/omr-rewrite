@@ -1,0 +1,20 @@
+NAME SECTION
+(x1, y1) = (113, 594)
+(x2, y2) = (857, 1476)
+
+STUDENT NUMBER SECTION
+(x1, y1) = (890, 624)
+(x2, y2) = (1338, 967)
+
+DATE OF BIRTH
+(x1, y1) = (1373, 621)
+(x2, y2) = (1596, 963)
+
+PACKAGE NUMBER
+(x1, y1) = (1520, 1095)
+(x2, y2) = (1596, 1438)
+
+ANSWER SECTION
+(x1, y1) = (146, 1528)
+(x2, y2) = (1571, 1926)
+
