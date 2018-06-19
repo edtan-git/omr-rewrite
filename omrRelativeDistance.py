@@ -37,7 +37,8 @@ def getRelativeAreaPoint(anchor_point, rectangles):
     for rectangle in rectangles:
         deviation_1 = calculateDeviation(anchor_point, rectangle[0])
         deviation_2 = calculateDeviation(anchor_point, rectangle[1])
-        relative_rectangle = [deviation_1, deviation_2]
+        section_name = rectangle[2]
+        relative_rectangle = [deviation_1, deviation_2, section_name]
         relative_rectangles.append(relative_rectangle)
 
     return relative_rectangles
@@ -47,7 +48,8 @@ def getRealAreaPoint(anchor_point, relative_points):
     for relative_point in relative_points:
         deviation_1 = calculateReverseDeviation(anchor_point, relative_point[0])
         deviation_2 = calculateReverseDeviation(anchor_point, relative_point[1])
-        relative_relative_point = [deviation_1, deviation_2]
+        section_name = relative_point[2]
+        relative_relative_point = [deviation_1, deviation_2, section_name]
         real_point.append(relative_relative_point)
 
     return real_point

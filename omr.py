@@ -4,11 +4,13 @@ import os
 import argparse
 import cv2
 import imutils
+import numpy as np
 from omrUtilities import findBlackBoxAnchor
 from omrUtilities import findDegreeBias
 from omrUtilities import rotateImage
 from drawRectangle import drawRectangleFromRelativePoint
 from informationExtractor import findCircle
+from informationExtractor import extractCircledBubble
 
 IMAGE_EXTENSION = '.png'
 DIR_PROCESSING_RESULT = 'processing_result'
@@ -42,7 +44,7 @@ image_extension = image_name_list[1]
 image_omr_sheet = cv2.imread(image_path)
 image_omr_sheet_gray = cv2.cvtColor(image_omr_sheet, cv2.COLOR_BGR2GRAY)
 image_omr_sheet_blurred = cv2.GaussianBlur(image_omr_sheet_gray, (5, 5), 0)
-image_omr_sheet_edged = cv2.Canny(image_omr_sheet_blurred, 75, 200)
+image_omr_sheet_edged = cv2.Canny(image_omr_sheet_blurred, 100, 200)
 image_omr_sheet_thresh = cv2.threshold(image_omr_sheet_gray, 0, 255,
                                        cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
@@ -110,17 +112,39 @@ rotated_threshold_image = rotateImage(
     degree_bias['rotation_matrix'],
     {'image_name': image_name + 'threshold'}
 )
+rotated_edged_image = rotateImage(
+    image_omr_sheet_edged,
+    degree_bias['rotation_matrix'],
+    {'image_name': image_name + 'edged'}
+)
 
 relative_points = [
-    [(-29, 481), (715, 1363)],
-    [(748, 511), (1196, 854)],
-    [(1231, 508), (1454, 850)],
-    [(1378, 982), (1454, 1325)],
-    [(4, 1415), (1429, 1813)]
+    [(-29, 481), (715, 1363), 'NAME'],
+    [(748, 511), (1196, 854), 'STUDENT_NUMBER'],
+    [(1231, 508), (1454, 850), 'DATE_OF_BIRTH'],
+    [(1378, 982), (1454, 1325), 'PACKAGE_NUMBER'],
+    [(4, 1415), (1429, 1813), 'ANSWER']
 ]
 drawRectangleFromRelativePoint(rotated_threshold_image, square_attributes, relative_points)
 
-findCircle(rotated_threshold_image, {'image_name': image_name})
+kernel = np.ones((1, 2), np.uint8)
+image_erosion = cv2.erode(rotated_threshold_image, kernel, iterations=1)
+populated_contour = findCircle(
+    image_erosion,
+    {
+        'image_name': image_name,
+        'points': relative_points,
+        'square_attributes': square_attributes
+    }
+)
+
+extractCircledBubble(
+    populated_contour,
+    cv2.cvtColor(rotated_threshold_image, cv2.COLOR_GRAY2RGB),
+    {
+        'image_name': image_name
+    }
+)
 
 # area_points = [
 #     [(113, 594), (857, 1476)],
