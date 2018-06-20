@@ -2,6 +2,7 @@
 
 import os
 import cv2
+import numpy as np
 import imutils
 from omrRelativeDistance import getSpecificSquarePoint
 from omrRelativeDistance import getRealAreaPoint
@@ -11,11 +12,11 @@ DIR_PROCESSING_RESULT = 'processing_result'
 # DEFAULT_CIRCLE_MIN_WIDTH = 29
 # DEFAULT_CIRCLE_MAX_WIDTH = 33
 
-DEFAULT_CIRCLE_MIN_WIDTH = 29
+DEFAULT_CIRCLE_MIN_WIDTH = 28
 # DEFAULT_CIRCLE_MAX_WIDTH = 36
 DEFAULT_CIRCLE_MAX_WIDTH = 40
 
-DEFAULT_CIRCLE_MIN_HEIGHT = 29
+DEFAULT_CIRCLE_MIN_HEIGHT = 28
 # DEFAULT_CIRCLE_MAX_HEIGHT = 33
 DEFAULT_CIRCLE_MAX_HEIGHT = 40
 
@@ -41,8 +42,14 @@ def findCircle(image, options):
         point = (tmp_contour[0][0][0], tmp_contour[0][0][1])
 
         if w >= DEFAULT_CIRCLE_MIN_WIDTH and w <= DEFAULT_CIRCLE_MAX_WIDTH and h >= DEFAULT_CIRCLE_MIN_HEIGHT and h <= DEFAULT_CIRCLE_MAX_HEIGHT:
-            populated_contours = populateCircle(real_area_points, populated_contours, (x, y, x+w, y+h), tmp_contour)
-            image_copy = cv2.drawContours(image_copy, [tmp_contour], -1, 255, -1)
+            populated_contours = populateCircle(
+                real_area_points,
+                populated_contours,
+                (x, y, x+w, y+h),
+                tmp_contour
+            )
+
+        image_copy = cv2.drawContours(image_copy, [tmp_contour], -1, 255, -1)
 
         cv2.putText(image_copy, str(h),
                     point, cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
@@ -95,6 +102,7 @@ def populateCircle(real_area_points, populated_contours, contour_area, contour):
     return populated_contours
 
 def extractCircledBubble(populated_contours, image, options):
+    print "extractCircleBubble was called\n"
     color = [
         (0, 0, 255),
         (0, 255, 0),
@@ -108,13 +116,37 @@ def extractCircledBubble(populated_contours, image, options):
     # print populated_contours
     for (j, index) in enumerate(populated_contours):
         populated_contour = populated_contours[index]
-        for contour in populated_contour:
-            image = cv2.drawContours(image, [contour], -1, color[j], -1)
+        if index == 'NAME':
+            extractName(populated_contour, image)
+        # for contour in populated_contour:
+        #     image = cv2.drawContours(image, [contour], -1, color[j], -1)
 
-    cv2.imwrite(
-        os.path.join(
-            DIR_PROCESSING_RESULT,
-            'image_populated_contour' + image_name + '.png'
-        ),
-        image
-    )
+    # cv2.imwrite(
+    #     os.path.join(
+    #         DIR_PROCESSING_RESULT,
+    #         'image_populated_contour' + image_name + '.png'
+    #     ),
+    #     image
+    # )
+
+def extractName(contours, image_threshold):
+    DATA_SORT = 'HORIZONTAL'
+    DATA_LENGTH = 20
+    DATA_OPTIONS_LENGTH = 26
+
+    index = 1
+    for contour in contours:
+        mask = np.zeros(image_threshold.shape, dtype="uint8")
+        image_mask_temp = cv2.drawContours(mask, [contour], -1, 255, -1)
+
+        mask = cv2.bitwise_and(image_threshold, image_threshold, mask=mask)
+        total = cv2.countNonZero(mask)
+        total_contour = cv2.contourArea(contour)
+
+        #calculate percentage
+        percentage_covered = total/total_contour
+
+        if (percentage_covered > 0.9):
+            print "this is selected " + str(index) + ' ' + str(percentage_covered)
+
+        index += 1

@@ -4,7 +4,6 @@ import os
 import argparse
 import cv2
 import imutils
-import numpy as np
 from omrUtilities import findBlackBoxAnchor
 from omrUtilities import findDegreeBias
 from omrUtilities import rotateImage
@@ -112,10 +111,20 @@ rotated_threshold_image = rotateImage(
     degree_bias['rotation_matrix'],
     {'image_name': image_name + 'threshold'}
 )
+rotated_threshold_image = cv2.threshold(rotated_threshold_image, 0, 255,
+                                           cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
 rotated_edged_image = rotateImage(
     image_omr_sheet_edged,
     degree_bias['rotation_matrix'],
     {'image_name': image_name + 'edged'}
+)
+cv2.imwrite(
+    os.path.join(
+        DIR_PROCESSING_RESULT,
+        'THRESHOLD_ROTATED_IMAGE_' + image_name + '.png'
+    ),
+    rotated_threshold_image
 )
 
 relative_points = [
@@ -127,10 +136,8 @@ relative_points = [
 ]
 drawRectangleFromRelativePoint(rotated_threshold_image, square_attributes, relative_points)
 
-kernel = np.ones((1, 2), np.uint8)
-image_erosion = cv2.erode(rotated_threshold_image, kernel, iterations=1)
 populated_contour = findCircle(
-    image_erosion,
+    rotated_threshold_image,
     {
         'image_name': image_name,
         'points': relative_points,
@@ -140,19 +147,9 @@ populated_contour = findCircle(
 
 extractCircledBubble(
     populated_contour,
-    cv2.cvtColor(rotated_threshold_image, cv2.COLOR_GRAY2RGB),
+    # cv2.cvtColor(rotated_threshold_image, cv2.COLOR_GRAY2RGB),
+    rotated_threshold_image,
     {
         'image_name': image_name
     }
 )
-
-# area_points = [
-#     [(113, 594), (857, 1476)],
-#     [(890, 624), (1338, 967)],
-#     [(1373, 621), (1596, 963)],
-#     [(1520, 1095), (1596, 1438)],
-#     [(146, 1528), (1571, 1926)]
-# ]
-
-# relative_area_points = calculateRelativePoint(square_attributes, area_points)
-# drawRectangle(image_omr_sheet, relative_area_points)

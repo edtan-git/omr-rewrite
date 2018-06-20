@@ -1,11 +1,5 @@
-"""Check Syntax File"""
-
-import sys
 import os
-from saveImage import *
+import cv2
 
-sys.path.append(os.path.abspath("library"))
-
-from saveImage2 import *
-
-watchout2()
+image_path = 'processing_result_rethresholding/RETHRESHOLDIND.png'
+image = cv2.imread(image_path)
