@@ -67,13 +67,13 @@ def findBlackBoxAnchor(contours, options):
         if is_threshold_ar_pass and is_threshold_w_pass and is_threshold_h_pass and total > 800:
             square_contours.append(tmp_contour)
             square_attributes.append((x, y, w, h))
-            cv2.imwrite(
-                os.path.join(
-                    DIR_PROCESSING_RESULT,
-                    'image_mask_by_index-' + str(j) + image_name + '.png'
-                ),
-                image_mask_temp
-            )
+            # cv2.imwrite(
+            #     os.path.join(
+            #         DIR_PROCESSING_RESULT,
+            #         'image_mask_by_index-' + str(j) + image_name + '.png'
+            #     ),
+            #     image_mask_temp
+            # )
 
             image_with_contour = cv2.putText(image_with_contour, 'cnz : ' + str(j) + ' ' + str(total) + ' ' + str(w) + ' ' + str(h),
                                              (int(x) - 80, int(y) + 20),
@@ -108,13 +108,13 @@ def findBlackBoxAnchor(contours, options):
                                           )
         index = index + 1
 
-    cv2.imwrite(
-        os.path.join(
-            DIR_PROCESSING_RESULT,
-            'image_with_contour-' + image_name + '.png'
-        ),
-        image_with_contour
-    )
+    # cv2.imwrite(
+    #     os.path.join(
+    #         DIR_PROCESSING_RESULT,
+    #         'image_with_contour-' + image_name + '.png'
+    #     ),
+    #     image_with_contour
+    # )
 
     return {
         'ordered_square_contours': ordered_square_contours,

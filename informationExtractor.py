@@ -4,6 +4,8 @@ import os
 import cv2
 import numpy as np
 import imutils
+import datetime
+
 from omrRelativeDistance import getSpecificSquarePoint
 from omrRelativeDistance import getRealAreaPoint
 
@@ -118,26 +120,38 @@ def extractCircledBubble(populated_contours, image, options):
         populated_contour = populated_contours[index]
         if index == 'NAME':
             extractName(populated_contour, image)
-        # for contour in populated_contour:
-        #     image = cv2.drawContours(image, [contour], -1, color[j], -1)
 
-    # cv2.imwrite(
-    #     os.path.join(
-    #         DIR_PROCESSING_RESULT,
-    #         'image_populated_contour' + image_name + '.png'
-    #     ),
-    #     image
-    # )
+        for contour in populated_contour:
+            image = cv2.drawContours(image, [contour], -1, color[j], -1)
+
+    cv2.imwrite(
+        os.path.join(
+            DIR_PROCESSING_RESULT,
+            'image_populated_contour' + image_name + '.png'
+        ),
+        image
+    )
 
 def extractName(contours, image_threshold):
+    print 'extractName was called'
     DATA_SORT = 'HORIZONTAL'
     DATA_LENGTH = 20
     DATA_OPTIONS_LENGTH = 26
 
+    now_datetime = datetime.datetime.now()
+    formated_datetime = str(now_datetime.year) + '{:02d}'.format(now_datetime.month) + '{:02d}'.format(now_datetime.day)
+    formated_datetime += '{:02d}'.format(now_datetime.day) + '{:02d}'.format(now_datetime.hour) + '{:02d}'.format(now_datetime.minute)
+    formated_datetime += '{:02d}'.format(now_datetime.second)
+    file_name = 'extract_information_result/' + formated_datetime + '.txt'
+
+    file = open(file_name, 'w+')
+
+    result_content = ''
+    total_selected = 0
     index = 1
     for contour in contours:
         mask = np.zeros(image_threshold.shape, dtype="uint8")
-        image_mask_temp = cv2.drawContours(mask, [contour], -1, 255, -1)
+        cv2.drawContours(mask, [contour], -1, 255, -1)
 
         mask = cv2.bitwise_and(image_threshold, image_threshold, mask=mask)
         total = cv2.countNonZero(mask)
@@ -147,6 +161,16 @@ def extractName(contours, image_threshold):
         percentage_covered = total/total_contour
 
         if (percentage_covered > 0.9):
-            print "this is selected " + str(index) + ' ' + str(percentage_covered)
+            total_selected += 1
+
+            result_content += "this is selected "
+            result_content += str(index) + " "
+            result_content += str(percentage_covered) + " "
+            result_content += "\n"
 
         index += 1
+
+    result_content += "Total selected:" + str(total_selected)
+    file.write(result_content)
+
+    print 'extractName executed'
