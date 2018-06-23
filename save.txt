@@ -1,0 +1,7 @@
+extractCircleBubble was called
+
+extractAnswerSheet was called
+extractStudentNumber was called
+extractDateOfBirth was called
+extractName was called
+extractPackageNumber was called

@@ -147,7 +147,6 @@ populated_contour = findCircle(
 
 extractCircledBubble(
     populated_contour,
-    # cv2.cvtColor(rotated_threshold_image, cv2.COLOR_GRAY2RGB),
     rotated_threshold_image,
     {
         'image_name': image_name

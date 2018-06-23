@@ -2,12 +2,17 @@
 
 import os
 import cv2
-import numpy as np
 import imutils
-import datetime
+import math
 
 from omrRelativeDistance import getSpecificSquarePoint
 from omrRelativeDistance import getRealAreaPoint
+
+from sortPopulatedContours import sortPopulatedContours
+
+from extractorLib import extractName, extractStudentNumber
+from extractorLib import extractDateOfBirth, extractPackageNumber
+from extractorLib import extractAnswerSheet
 
 DIR_PROCESSING_RESULT = 'processing_result'
 
@@ -95,15 +100,27 @@ def populateCircle(real_area_points, populated_contours, contour_area, contour):
             y_valid = (y >= area_y1) and (y <= area_y2)
 
             if x_valid and y_valid:
+                contour_distance = calculateContourDistance(
+                    (area_x1, area_y1),
+                    (x_start, y_start)
+                )
+
                 if index_name in populated_contours:
-                    populated_contours[index_name].append(contour)
+                    counter = len(populated_contours[index_name]['contour_distances'])
+                    populated_contours[index_name]['contours'].append(contour)
+                    populated_contours[index_name]['contour_distances'].append((counter, contour_distance))
                 else:
-                    populated_contours[index_name] = [contour]
+                    populated_contours[index_name] = {}
+                    populated_contours[index_name]['contours'] = list()
+                    populated_contours[index_name]['contour_distances'] = list()
+                    populated_contours[index_name]['contours'].append(contour)
+                    populated_contours[index_name]['contour_distances'].append((0, contour_distance))
                 break
 
     return populated_contours
 
 def extractCircledBubble(populated_contours, image, options):
+    """ choose what function should be called based """
     print "extractCircleBubble was called\n"
     color = [
         (0, 0, 255),
@@ -114,63 +131,56 @@ def extractCircledBubble(populated_contours, image, options):
     ]
 
     image_name = options['image_name']
+    image_color = image.copy()
+    image_color = cv2.cvtColor(image_color, cv2.COLOR_GRAY2RGB)
 
+    # populated_contours = sortPopulatedContours(populated_contours, image)
     # print populated_contours
+    image_checker = image_color.copy()
     for (j, index) in enumerate(populated_contours):
         populated_contour = populated_contours[index]
-        if index == 'NAME':
-            extractName(populated_contour, image)
 
-        for contour in populated_contour:
-            image = cv2.drawContours(image, [contour], -1, color[j], -1)
+        if index == 'NAME':
+            contours = sortLeftToRightContours(populated_contour['contours'])
+            image_checker = extractName(contours, image_checker)
+        elif index == 'STUDENT_NUMBER':
+            contours = sortLeftToRightContours(populated_contour['contours'])
+            image_checker = extractStudentNumber(contours, image_checker)
+        elif index == 'DATE_OF_BIRTH':
+            contours = sortLeftToRightContours(populated_contour['contours'])
+            image_checker = extractDateOfBirth(contours, image_checker)
+        elif index == 'PACKAGE_NUMBER':
+            contours = sortLeftToRightContours(populated_contour['contours'])
+            image_checker = extractPackageNumber(contours, image_checker)
+        elif index == 'ANSWER':
+            contours = populated_contour['contours']
+            image_checker = extractAnswerSheet(contours, image_checker)
+
+        for contour in populated_contour['contours']:
+            image_color = cv2.drawContours(image_color, [contour], -1, color[j], -1)
 
     cv2.imwrite(
         os.path.join(
             DIR_PROCESSING_RESULT,
             'image_populated_contour' + image_name + '.png'
         ),
-        image
+        image_color
     )
 
-def extractName(contours, image_threshold):
-    print 'extractName was called'
-    DATA_SORT = 'HORIZONTAL'
-    DATA_LENGTH = 20
-    DATA_OPTIONS_LENGTH = 26
+def calculateContourDistance(anchor_point, target_point):
+    """ calculate the distance between two point """
+    delta_x = target_point[0] - anchor_point[0]
+    delta_y = target_point[1] - anchor_point[1]
 
-    now_datetime = datetime.datetime.now()
-    formated_datetime = str(now_datetime.year) + '{:02d}'.format(now_datetime.month) + '{:02d}'.format(now_datetime.day)
-    formated_datetime += '{:02d}'.format(now_datetime.day) + '{:02d}'.format(now_datetime.hour) + '{:02d}'.format(now_datetime.minute)
-    formated_datetime += '{:02d}'.format(now_datetime.second)
-    file_name = 'extract_information_result/' + formated_datetime + '.txt'
+    distance = math.sqrt(delta_x**2 + delta_y**2)
+    distance = int(round(distance))
 
-    file = open(file_name, 'w+')
+    return distance
 
-    result_content = ''
-    total_selected = 0
-    index = 1
-    for contour in contours:
-        mask = np.zeros(image_threshold.shape, dtype="uint8")
-        cv2.drawContours(mask, [contour], -1, 255, -1)
+def sortLeftToRightContours(contours):
+    sorted_contours = imutils.contours.sort_contours(
+        contours,
+        method="left-to-right"
+    )[0]
 
-        mask = cv2.bitwise_and(image_threshold, image_threshold, mask=mask)
-        total = cv2.countNonZero(mask)
-        total_contour = cv2.contourArea(contour)
-
-        #calculate percentage
-        percentage_covered = total/total_contour
-
-        if (percentage_covered > 0.9):
-            total_selected += 1
-
-            result_content += "this is selected "
-            result_content += str(index) + " "
-            result_content += str(percentage_covered) + " "
-            result_content += "\n"
-
-        index += 1
-
-    result_content += "Total selected:" + str(total_selected)
-    file.write(result_content)
-
-    print 'extractName executed'
+    return sorted_contours

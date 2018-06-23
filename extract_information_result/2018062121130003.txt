@@ -1,0 +1,12 @@
+this is selected 221 1.05643994211 
+this is selected 245 1.06451612903 
+this is selected 286 1.06696764485 
+this is selected 305 1.06065318818 
+this is selected 332 1.06943450251 
+this is selected 375 1.0625 
+this is selected 404 1.06530291109 
+this is selected 438 1.06529713866 
+this is selected 451 1.06576980568 
+this is selected 472 1.06485671192 
+this is selected 519 1.06481481481 
+Total selected:11
