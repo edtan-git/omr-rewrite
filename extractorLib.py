@@ -6,55 +6,46 @@ import numpy as np
 import imutils
 
 DIR_PROCESSING_RESULT = 'processing_result'
+COLOR = [
+    (0, 0, 255),
+    (0, 255, 0),
+    (255, 0, 0),
+    (255, 255, 0),
+    (255, 0, 255)
+]
 
 def extractName(contours, image_threshold):
     """ extract information from vertical aligned bubble """
     print 'extractName was called'
-    color = [
-        (0, 0, 255),
-        (0, 255, 0),
-        (255, 0, 0),
-        (255, 255, 0),
-        (255, 0, 255)
-    ]
-    DATA_SORT = 'HORIZONTAL'
-    DATA_LENGTH = 20
     DATA_OPTIONS_LENGTH = 26
-    log_result_content = ''
-
-    file_name = createSelectedItemLogFileName()
-    file = open(file_name, 'w+')
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
     image_threshold_color = image_threshold.copy()
+    image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
     index = 0
+    selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
 
+        selected_options.append(None)
         for (j, contour) in enumerate(tmp_contours):
-            index += 1
-            (x, y, w, h) = cv2.boundingRect(contour)
-            image_threshold_color = cv2.putText(
+            return_check_contour = checkIfContourSelected(
+                image_threshold,
                 image_threshold_color,
-                str(index),
-                (x, y),
-                cv2.FONT_HERSHEY_COMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
+                contour,
+                selected_options,
+                {
+                    'index': index,
+                    'index_contour': j
+                }
             )
-            image_threshold_color = cv2.drawContours(
-                image_threshold_color,
-                [contour],
-                -1,
-                color[q%5],
-                -1
-            )
-    
+            image_threshold_color = return_check_contour['image_threshold_color']
+            selected_options = return_check_contour['selected_options']
+
     cv2.imwrite(
         os.path.join(
             DIR_PROCESSING_RESULT,
@@ -62,55 +53,41 @@ def extractName(contours, image_threshold):
         ),
         image_threshold_color
     )
+
+    print selected_options
 
     return image_threshold_color
 
 def extractStudentNumber(contours, image_threshold):
+    """ extract student number """
     print 'extractStudentNumber was called'
-    color = [
-        (0, 0, 255),
-        (0, 255, 0),
-        (255, 0, 0),
-        (255, 255, 0),
-        (255, 0, 255)
-    ]
-    DATA_SORT = 'HORIZONTAL'
-    DATA_LENGTH = 20
     DATA_OPTIONS_LENGTH = 10
-    log_result_content = ''
-
-    file_name = createSelectedItemLogFileName()
-    file = open(file_name, 'w+')
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
     image_threshold_color = image_threshold.copy()
+    image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
-    index = 0
+    selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
 
+        selected_options.append(None)
         for (j, contour) in enumerate(tmp_contours):
-            index += 1
-            (x, y, w, h) = cv2.boundingRect(contour)
-            image_threshold_color = cv2.putText(
+            return_check_contour = checkIfContourSelected(
+                image_threshold,
                 image_threshold_color,
-                str(index),
-                (x, y),
-                cv2.FONT_HERSHEY_COMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
+                contour,
+                selected_options,
+                {
+                    'index_contour': j
+                }
             )
-            image_threshold_color = cv2.drawContours(
-                image_threshold_color,
-                [contour],
-                -1,
-                color[q%5],
-                -1
-            )
+
+            selected_options = return_check_contour['selected_options']
+            image_threshold_color = return_check_contour['image_threshold_color']
 
     cv2.imwrite(
         os.path.join(
@@ -119,33 +96,25 @@ def extractStudentNumber(contours, image_threshold):
         ),
         image_threshold_color
     )
+
+    print selected_options
+
     return image_threshold_color
 
 def extractDateOfBirth(contours, image_threshold):
     """ extract information from vertical aligned bubble """
     print 'extractDateOfBirth was called'
-    color = [
-        (0, 0, 255),
-        (0, 255, 0),
-        (255, 0, 0),
-        (255, 255, 0),
-        (255, 0, 255)
-    ]
-    DATA_SORT = 'HORIZONTAL'
-    DATA_LENGTH = 20
-    DATA_OPTIONS_LENGTHS = [4, 10, 2, 10, 10, 10]
-    # DATA_OPTIONS_LENGTH = 8
-    log_result_content = ''
 
-    file_name = createSelectedItemLogFileName()
-    file = open(file_name, 'w+')
+    DATA_OPTIONS_LENGTHS = [4, 10, 2, 10, 10, 10]
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
     image_threshold_color = image_threshold.copy()
+    image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
     start = 0
     index = 0
     color_counter = 0
+    selected_options = list()
     for data_options_length in DATA_OPTIONS_LENGTHS:
         color_counter += 1
         end = start + data_options_length
@@ -157,25 +126,20 @@ def extractDateOfBirth(contours, image_threshold):
             method="top-to-bottom"
         )[0]
 
+        selected_options.append(None)
         for (j, contour) in enumerate(tmp_contours):
-            index += 1
-            (x, y, w, h) = cv2.boundingRect(contour)
-            image_threshold_color = cv2.putText(
+            return_check_contour = checkIfContourSelected(
+                image_threshold,
                 image_threshold_color,
-                str(index),
-                (x, y),
-                cv2.FONT_HERSHEY_COMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
+                contour,
+                selected_options,
+                {
+                    'index_contour': j
+                }
             )
-            image_threshold_color = cv2.drawContours(
-                image_threshold_color,
-                [contour],
-                -1,
-                color[color_counter%5],
-                -1
-            )
+
+            selected_options = return_check_contour['selected_options']
+            image_threshold_color = return_check_contour['image_threshold_color']
 
     cv2.imwrite(
         os.path.join(
@@ -184,56 +148,41 @@ def extractDateOfBirth(contours, image_threshold):
         ),
         image_threshold_color
     )
+
+    print selected_options
 
     return image_threshold_color
 
 def extractPackageNumber(contours, image_threshold):
     """ extract package number """
     print 'extractPackageNumber was called'
-    color = [
-        (0, 0, 255),
-        (0, 255, 0),
-        (255, 0, 0),
-        (255, 255, 0),
-        (255, 0, 255)
-    ]
-    DATA_SORT = 'HORIZONTAL'
-    DATA_LENGTH = 20
     DATA_OPTIONS_LENGTH = 10
-    log_result_content = ''
-
-    file_name = createSelectedItemLogFileName()
-    file = open(file_name, 'w+')
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
     image_threshold_color = image_threshold.copy()
+    image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
-    index = 0
+    selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
 
+        selected_options.append(None)
         for (j, contour) in enumerate(tmp_contours):
-            index += 1
-            (x, y, w, h) = cv2.boundingRect(contour)
-            image_threshold_color = cv2.putText(
+            return_check_contour = checkIfContourSelected(
+                image_threshold,
                 image_threshold_color,
-                str(index),
-                (x, y),
-                cv2.FONT_HERSHEY_COMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
+                contour,
+                selected_options,
+                {
+                    'index_contour': j
+                }
             )
-            image_threshold_color = cv2.drawContours(
-                image_threshold_color,
-                [contour],
-                -1,
-                color[q%5],
-                -1
-            )
+
+            selected_options = return_check_contour['selected_options']
+            image_threshold_color = return_check_contour['image_threshold_color']
 
     cv2.imwrite(
         os.path.join(
@@ -243,35 +192,26 @@ def extractPackageNumber(contours, image_threshold):
         image_threshold_color
     )
 
+    print selected_options
+
     return image_threshold_color
 
 def extractAnswerSheet(contours, image_threshold):
     """ extract answer sheet """
     print "extractAnswerSheet was called"
-    color = [
-        (0, 0, 255),
-        (0, 255, 0),
-        (255, 0, 0),
-        (255, 255, 0),
-        (255, 0, 255)
-    ]
-    DATA_SORT = 'HORIZONTAL'
     DATA_LENGTH = 5
     DATA_OPTIONS_LENGTH = 50
-    log_result_content = ''
-
-    file_name = createSelectedItemLogFileName()
-    file = open(file_name, 'w+')
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
     image_threshold_color = image_threshold.copy()
+    image_threshold = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_BGR2GRAY)
 
     contours = imutils.contours.sort_contours(
         contours,
         method="left-to-right"
     )[0]
 
-    index = 0
+    selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
@@ -284,45 +224,20 @@ def extractAnswerSheet(contours, image_threshold):
                 method="left-to-right"
             )[0]
 
-            for contour in tmp_answer_contours:
-                index += 1
-                (x, y, w, h) = cv2.boundingRect(contour)
-                image_threshold_color = cv2.putText(
+            selected_options.append(None)
+            for (s, contour) in enumerate(tmp_answer_contours):
+                return_check_contour = checkIfContourSelected(
+                    image_threshold,
                     image_threshold_color,
-                    str(index),
-                    (x, y),
-                    cv2.FONT_HERSHEY_COMPLEX,
-                    0.5,
-                    (0, 255, 0),
-                    1
-                )
-                image_threshold_color = cv2.drawContours(
-                    image_threshold_color,
-                    [contour],
-                    -1,
-                    color[r%5],
-                    -1
+                    contour,
+                    selected_options,
+                    {
+                        'index_contour': s
+                    }
                 )
 
-        # for contour in tmp_contours:
-        #     index += 1
-        #     (x, y, w, h) = cv2.boundingRect(contour)
-        #     image_threshold_color = cv2.putText(
-        #         image_threshold_color,
-        #         str(index),
-        #         (x, y),
-        #         cv2.FONT_HERSHEY_COMPLEX,
-        #         0.5,
-        #         (0, 255, 0),
-        #         1
-        #     )
-        #     image_threshold_color = cv2.drawContours(
-        #         image_threshold_color,
-        #         [contour],
-        #         -1,
-        #         color[q%5],
-        #         -1
-        #     )
+                selected_options = return_check_contour['selected_options']
+                image_threshold_color = return_check_contour['image_threshold_color']
 
     cv2.imwrite(
         os.path.join(
@@ -332,44 +247,48 @@ def extractAnswerSheet(contours, image_threshold):
         image_threshold_color
     )
 
-    return image_threshold_color
-
-    index = 0
-    for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
-        tmp_contours = imutils.contours.sort_contours(
-            contours[i:i+DATA_OPTIONS_LENGTH],
-            method="left-to-right"
-        )[0]
-
-        for (j, contour) in enumerate(tmp_contours):
-            index += 1
-            (x, y, w, h) = cv2.boundingRect(contour)
-            image_threshold_color = cv2.putText(
-                image_threshold_color,
-                str(index),
-                (x, y),
-                cv2.FONT_HERSHEY_COMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
-            )
-            image_threshold_color = cv2.drawContours(
-                image_threshold_color,
-                [contour],
-                -1,
-                color[q%5],
-                -1
-            )
-
-    cv2.imwrite(
-        os.path.join(
-            DIR_PROCESSING_RESULT,
-            'SELECTED_OPTIONS.png'
-        ),
-        image_threshold_color
-    )
+    print selected_options
 
     return image_threshold_color
+
+def checkIfContourSelected(image_threshold, image_threshold_color, contour, selected_options, options):
+    index_contour = options['index_contour']
+
+    (x, y, w, h) = cv2.boundingRect(contour)
+
+    mask = np.zeros(image_threshold.shape, dtype="uint8")
+    cv2.drawContours(mask, [contour], -1, 255, -1)
+
+    mask = cv2.bitwise_and(image_threshold, image_threshold, mask=mask)
+    total = cv2.countNonZero(mask)
+    total_area = cv2.contourArea(contour)
+
+    percentage_covered = total / total_area
+
+    if percentage_covered > 0.9:
+        selected_options[len(selected_options) - 1] = index_contour
+
+        image_threshold_color = cv2.putText(
+            image_threshold_color,
+            str(index_contour),
+            (x, y),
+            cv2.FONT_HERSHEY_COMPLEX,
+            0.5,
+            (0, 0, 255),
+            1
+        )
+        image_threshold_color = cv2.drawContours(
+            image_threshold_color,
+            [contour],
+            -1,
+            (0, 255, 0),
+            -1
+        )
+
+    return {
+        'selected_options': selected_options,
+        'image_threshold_color': image_threshold_color
+    }
 
 def createSelectedItemLogFileName():
     """ create selected item log filename """
