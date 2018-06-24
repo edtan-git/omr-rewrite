@@ -6,6 +6,15 @@ import numpy as np
 import imutils
 
 DIR_PROCESSING_RESULT = 'processing_result'
+BASE_OPTIONS_ALPHABET = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+    'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+]
+BASE_OPTIONS_NUMBER = [
+    '1', '2', '3', '4', '5',
+    '6', '7', '8', '9', '0'
+]
 COLOR = [
     (0, 0, 255),
     (0, 255, 0),
@@ -23,7 +32,6 @@ def extractName(contours, image_threshold):
     image_threshold_color = image_threshold.copy()
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
-    index = 0
     selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
@@ -31,7 +39,9 @@ def extractName(contours, image_threshold):
             method="top-to-bottom"
         )[0]
 
-        selected_options.append(None)
+        selected_options.append(list())
+        tmp_selected_values = list()
+        tmp_selected_values.append(None)
         for (j, contour) in enumerate(tmp_contours):
             return_check_contour = checkIfContourSelected(
                 image_threshold,
@@ -39,12 +49,15 @@ def extractName(contours, image_threshold):
                 contour,
                 selected_options,
                 {
-                    'index': index,
-                    'index_contour': j
+                    'index_contour': j,
+                    'tmp_selected_values': tmp_selected_values
                 }
             )
+
+            tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
-            selected_options = return_check_contour['selected_options']
+
+        selected_options[len(selected_options) - 1] = tmp_selected_values
 
     cv2.imwrite(
         os.path.join(
@@ -74,7 +87,9 @@ def extractStudentNumber(contours, image_threshold):
             method="top-to-bottom"
         )[0]
 
-        selected_options.append(None)
+        selected_options.append(list())
+        tmp_selected_values = list()
+        tmp_selected_values.append(None)
         for (j, contour) in enumerate(tmp_contours):
             return_check_contour = checkIfContourSelected(
                 image_threshold,
@@ -82,12 +97,15 @@ def extractStudentNumber(contours, image_threshold):
                 contour,
                 selected_options,
                 {
-                    'index_contour': j
+                    'index_contour': j,
+                    'tmp_selected_values': tmp_selected_values
                 }
             )
 
-            selected_options = return_check_contour['selected_options']
+            tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
+
+        selected_options[len(selected_options) - 1] = tmp_selected_values
 
     cv2.imwrite(
         os.path.join(
@@ -112,11 +130,8 @@ def extractDateOfBirth(contours, image_threshold):
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
     start = 0
-    index = 0
-    color_counter = 0
     selected_options = list()
     for data_options_length in DATA_OPTIONS_LENGTHS:
-        color_counter += 1
         end = start + data_options_length
         process_contours = contours[start:end]
         start = end
@@ -126,7 +141,9 @@ def extractDateOfBirth(contours, image_threshold):
             method="top-to-bottom"
         )[0]
 
-        selected_options.append(None)
+        selected_options.append(list())
+        tmp_selected_values = list()
+        tmp_selected_values.append(None)
         for (j, contour) in enumerate(tmp_contours):
             return_check_contour = checkIfContourSelected(
                 image_threshold,
@@ -134,12 +151,15 @@ def extractDateOfBirth(contours, image_threshold):
                 contour,
                 selected_options,
                 {
-                    'index_contour': j
+                    'index_contour': j,
+                    'tmp_selected_values': tmp_selected_values
                 }
             )
 
-            selected_options = return_check_contour['selected_options']
+            tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
+
+        selected_options[len(selected_options) - 1] = tmp_selected_values
 
     cv2.imwrite(
         os.path.join(
@@ -169,7 +189,9 @@ def extractPackageNumber(contours, image_threshold):
             method="top-to-bottom"
         )[0]
 
-        selected_options.append(None)
+        selected_options.append(list())
+        tmp_selected_values = list()
+        tmp_selected_values.append(None)
         for (j, contour) in enumerate(tmp_contours):
             return_check_contour = checkIfContourSelected(
                 image_threshold,
@@ -177,12 +199,15 @@ def extractPackageNumber(contours, image_threshold):
                 contour,
                 selected_options,
                 {
-                    'index_contour': j
+                    'index_contour': j,
+                    'tmp_selected_values': tmp_selected_values
                 }
             )
 
-            selected_options = return_check_contour['selected_options']
+            tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
+
+        selected_options[len(selected_options) - 1] = tmp_selected_values
 
     cv2.imwrite(
         os.path.join(
@@ -212,6 +237,7 @@ def extractAnswerSheet(contours, image_threshold):
     )[0]
 
     selected_options = list()
+    tmp_result = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
@@ -224,7 +250,9 @@ def extractAnswerSheet(contours, image_threshold):
                 method="left-to-right"
             )[0]
 
-            selected_options.append(None)
+            selected_options.append(list())
+            tmp_selected_values = list()
+            tmp_selected_values.append(None)
             for (s, contour) in enumerate(tmp_answer_contours):
                 return_check_contour = checkIfContourSelected(
                     image_threshold,
@@ -232,12 +260,15 @@ def extractAnswerSheet(contours, image_threshold):
                     contour,
                     selected_options,
                     {
-                        'index_contour': s
+                        'index_contour': s,
+                        'tmp_selected_values': tmp_selected_values
                     }
                 )
 
-                selected_options = return_check_contour['selected_options']
+                tmp_selected_values = return_check_contour['tmp_selected_values']
                 image_threshold_color = return_check_contour['image_threshold_color']
+
+            selected_options[len(selected_options) - 1] = tmp_selected_values
 
     cv2.imwrite(
         os.path.join(
@@ -252,7 +283,12 @@ def extractAnswerSheet(contours, image_threshold):
     return image_threshold_color
 
 def checkIfContourSelected(image_threshold, image_threshold_color, contour, selected_options, options):
+    selected = False
     index_contour = options['index_contour']
+    tmp_selected_values = options['tmp_selected_values']
+    value_type = 'ALPHABET'
+    if 'value_type' in options:
+        value_type = 'NUMERIC'
 
     (x, y, w, h) = cv2.boundingRect(contour)
 
@@ -266,7 +302,7 @@ def checkIfContourSelected(image_threshold, image_threshold_color, contour, sele
     percentage_covered = total / total_area
 
     if percentage_covered > 0.9:
-        selected_options[len(selected_options) - 1] = index_contour
+        selected = True
 
         image_threshold_color = cv2.putText(
             image_threshold_color,
@@ -285,10 +321,34 @@ def checkIfContourSelected(image_threshold, image_threshold_color, contour, sele
             -1
         )
 
+    selected_value = None
+    if selected:
+        selected_value = index_contour
+
+    if selected_value != None:
+        if tmp_selected_values[0] is None:
+            tmp_selected_values = list()
+            tmp_selected_values.append(selected_value)
+        else:
+            tmp_selected_values.append(selected_value)
+
     return {
+        'selected_value': selected_value,
         'selected_options': selected_options,
-        'image_threshold_color': image_threshold_color
+        'image_threshold_color': image_threshold_color,
+        'tmp_selected_values': tmp_selected_values
     }
+
+def getSelectedValue(value_type, index):
+    """ return value from selected index """
+    if value_type == 'ALPHABET':
+        return_value = ' '
+        if index in BASE_OPTIONS_ALPHABET:
+            return_value = BASE_OPTIONS_ALPHABET[index]
+
+        return return_value
+    elif value_type == 'NUMERIC':
+        return BASE_OPTIONS_NUMBER[index]
 
 def createSelectedItemLogFileName():
     """ create selected item log filename """
