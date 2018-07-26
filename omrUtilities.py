@@ -108,13 +108,13 @@ def findBlackBoxAnchor(contours, options):
                                           )
         index = index + 1
 
-    # cv2.imwrite(
-    #     os.path.join(
-    #         DIR_PROCESSING_RESULT,
-    #         'image_with_contour-' + image_name + '.png'
-    #     ),
-    #     image_with_contour
-    # )
+    cv2.imwrite(
+        os.path.join(
+            DIR_PROCESSING_RESULT,
+            'RECTANGLE-BOX-' + image_name + '.png'
+        ),
+        image_with_contour
+    )
 
     return {
         'ordered_square_contours': ordered_square_contours,

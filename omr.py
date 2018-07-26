@@ -4,12 +4,14 @@ import os
 import argparse
 import cv2
 import imutils
+import numpy as np
 from omrUtilities import findBlackBoxAnchor
 from omrUtilities import findDegreeBias
 from omrUtilities import rotateImage
 from drawRectangle import drawRectangleFromRelativePoint
 from informationExtractor import findCircle
 from informationExtractor import extractCircledBubble
+
 
 IMAGE_EXTENSION = '.png'
 DIR_PROCESSING_RESULT = 'processing_result'
@@ -46,6 +48,15 @@ image_omr_sheet_blurred = cv2.GaussianBlur(image_omr_sheet_gray, (5, 5), 0)
 image_omr_sheet_edged = cv2.Canny(image_omr_sheet_blurred, 100, 200)
 image_omr_sheet_thresh = cv2.threshold(image_omr_sheet_gray, 0, 255,
                                        cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+
+kernel = np.ones((2,2), np.uint8)
+image_test_dilate = image_omr_sheet_thresh.copy()
+dilation = cv2.dilate(image_test_dilate, kernel, iterations = 1)
+path_gray = createPath(
+    DIR_PROCESSING_RESULT,
+    'IMAGE_DILATE-' + image_name + IMAGE_EXTENSION
+)
+saveImage(path_gray, dilation)
 
 path_gray = createPath(
     DIR_PROCESSING_RESULT,
@@ -106,6 +117,8 @@ rotated_image = rotateImage(image_omr_sheet,
                             degree_bias['rotation_matrix'],
                             {'image_name': image_name}
                            )
+
+image_omr_sheet_thresh = dilation.copy()
 rotated_threshold_image = rotateImage(
     image_omr_sheet_thresh,
     degree_bias['rotation_matrix'],
@@ -127,12 +140,69 @@ cv2.imwrite(
     rotated_threshold_image
 )
 
+# relative_points = [
+#     [(-29, 481), (715, 1363), 'NAME'],
+#     [(748, 511), (1196, 854), 'STUDENT_NUMBER'],
+#     [(1231, 508), (1454, 850), 'DATE_OF_BIRTH'],
+#     [(1378, 982), (1454, 1325), 'PACKAGE_NUMBER'],
+#     [(4, 1415), (1429, 1813), 'ANSWER']
+# ]
+
+# 3 section 01
+# relative_points = [
+#     [(594, 924), (1345, 1818), 'NAME'],
+#     [(76, 915), (541, 1269), 'STUDENT_NUMBER'],
+#     [(-14, 399), (1432, 804), 'ANSWER']
+# ]
+
+# 3 section 02
+# relative_points = [
+#     [(591, 488), (1345, 1386), 'NAME'],
+#     [(79, 486), (538, 841), 'STUDENT_NUMBER'],
+#     [(-9, 1416), (1418, 1832), 'ANSWER']
+# ]
+
+# 4 section 01
+# relative_points = [
+#     [(596, 921), (1351, 1816), 'NAME'],
+#     [(85, 916), (543, 1267), 'STUDENT_NUMBER'],
+#     [(86, 1347), (316, 1699), 'DATE_OF_BIRTH'],
+#     [(-11, 400), (1437, 808), 'ANSWER']
+# ]
+
+# 4 section 02
+# relative_points = [
+#     [(596, 479), (1349, 1370), 'NAME'],
+#     [(86, 479), (538, 825), 'STUDENT_NUMBER'],
+#     [(88, 951), (315, 1297), 'DATE_OF_BIRTH'],
+#     [(-8, 1405), (1421, 1821), 'ANSWER']
+# ]
+
+# 5 section 01
+# relative_points = [
+#     [(600, 918), (1351, 1812), 'NAME'],
+#     [(84, 952), (544, 1304), 'STUDENT_NUMBER'],
+#     [(86, 1425), (318, 1777), 'DATE_OF_BIRTH'],
+#     [(402, 1426), (485, 1774), 'PACKAGE_NUMBER'],
+#     [(-1, 367), (1424, 762), 'ANSWER']
+# ]
+
+# 5 section 02
+# relative_points = [
+#     [(600, 918), (1351, 1812), 'NAME'],
+#     [(81, 1423), (541, 1772), 'STUDENT_NUMBER'],
+#     [(82, 943), (315, 1292), 'DATE_OF_BIRTH'],
+#     [(400, 945), (480, 1288), 'PACKAGE_NUMBER'],
+#     [(-1, 367), (1424, 762), 'ANSWER']
+# ]
+
+# 5 section 03
 relative_points = [
-    [(-29, 481), (715, 1363), 'NAME'],
-    [(748, 511), (1196, 854), 'STUDENT_NUMBER'],
-    [(1231, 508), (1454, 850), 'DATE_OF_BIRTH'],
-    [(1378, 982), (1454, 1325), 'PACKAGE_NUMBER'],
-    [(4, 1415), (1429, 1813), 'ANSWER']
+    [(598, 481), (1349, 1370), 'NAME'],
+    [(88, 480), (538, 825), 'STUDENT_NUMBER'],
+    [(86, 951), (315, 1297), 'DATE_OF_BIRTH'],
+    [(404, 955), (484, 1302), 'PACKAGE_NUMBER'],
+    [(-8, 1405), (1421, 1821), 'ANSWER']
 ]
 drawRectangleFromRelativePoint(rotated_threshold_image, square_attributes, relative_points)
 

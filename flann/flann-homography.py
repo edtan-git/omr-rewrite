@@ -55,7 +55,7 @@ kp2, des2 = sift.detectAndCompute(image_train, None)
 
 # FLANN parameters
 FLANN_INDEX_KDTREE = 0
-index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees=5)
+index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
 search_params = dict(checks=100)
 
 flann = cv2.FlannBasedMatcher(index_params, search_params)
