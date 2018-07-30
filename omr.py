@@ -156,11 +156,11 @@ cv2.imwrite(
 # ]
 
 # 3 section 02
-# relative_points = [
-#     [(591, 488), (1345, 1386), 'NAME'],
-#     [(79, 486), (538, 841), 'STUDENT_NUMBER'],
-#     [(-9, 1416), (1418, 1832), 'ANSWER']
-# ]
+relative_points = [
+    [(591, 488), (1345, 1386), 'NAME'],
+    [(79, 486), (538, 841), 'STUDENT_NUMBER'],
+    [(-9, 1416), (1418, 1832), 'ANSWER']
+]
 
 # 4 section 01
 # relative_points = [
@@ -178,7 +178,7 @@ cv2.imwrite(
 #     [(-8, 1405), (1421, 1821), 'ANSWER']
 # ]
 
-# 5 section 01
+# 5 section 05
 # relative_points = [
 #     [(600, 918), (1351, 1812), 'NAME'],
 #     [(84, 952), (544, 1304), 'STUDENT_NUMBER'],
@@ -197,13 +197,13 @@ cv2.imwrite(
 # ]
 
 # 5 section 03
-relative_points = [
-    [(598, 481), (1349, 1370), 'NAME'],
-    [(88, 480), (538, 825), 'STUDENT_NUMBER'],
-    [(86, 951), (315, 1297), 'DATE_OF_BIRTH'],
-    [(404, 955), (484, 1302), 'PACKAGE_NUMBER'],
-    [(-8, 1405), (1421, 1821), 'ANSWER']
-]
+# relative_points = [
+#     [(598, 481), (1349, 1370), 'NAME'],
+#     [(88, 480), (538, 825), 'STUDENT_NUMBER'],
+#     [(86, 951), (315, 1297), 'DATE_OF_BIRTH'],
+#     [(404, 955), (484, 1302), 'PACKAGE_NUMBER'],
+#     [(-8, 1405), (1421, 1821), 'ANSWER']
+# ]
 drawRectangleFromRelativePoint(rotated_threshold_image, square_attributes, relative_points)
 
 populated_contour = findCircle(

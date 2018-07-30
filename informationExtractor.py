@@ -121,7 +121,7 @@ def populateCircle(real_area_points, populated_contours, contour_area, contour):
 
 def extractCircledBubble(populated_contours, image, options):
     """ choose what function should be called based """
-    print "extractCircleBubble was called\n"
+    # print "extractCircleBubble was called\n"
     color = [
         (0, 0, 255),
         (0, 255, 0),

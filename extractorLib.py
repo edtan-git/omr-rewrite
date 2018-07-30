@@ -12,8 +12,8 @@ BASE_OPTIONS_ALPHABET = [
     'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ]
 BASE_OPTIONS_NUMBER = [
-    '1', '2', '3', '4', '5',
-    '6', '7', '8', '9', '0'
+    '0', '1', '2', '3', '4', '5',
+    '6', '7', '8', '9'
 ]
 COLOR = [
     (0, 0, 255),
@@ -25,7 +25,7 @@ COLOR = [
 
 def extractName(contours, image_threshold):
     """ extract information from vertical aligned bubble """
-    print 'extractName was called'
+    # print 'extractName was called'
     DATA_OPTIONS_LENGTH = 26
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
@@ -67,13 +67,23 @@ def extractName(contours, image_threshold):
         image_threshold_color
     )
 
-    print selected_options
+    # print selected_options
+
+    name = ""
+    for selected_option in selected_options:
+        if selected_option[0] == None:
+            name += " "
+        else:
+            name += BASE_OPTIONS_ALPHABET[selected_option[0]]
+        name += "|"
+
+    print name
 
     return image_threshold_color
 
 def extractStudentNumber(contours, image_threshold):
     """ extract student number """
-    print 'extractStudentNumber was called'
+    # print 'extractStudentNumber was called'
     DATA_OPTIONS_LENGTH = 10
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
@@ -115,13 +125,21 @@ def extractStudentNumber(contours, image_threshold):
         image_threshold_color
     )
 
-    print selected_options
+    student_number = ""
+    for selected_option in selected_options:
+        if selected_option[0] == None:
+            student_number += " "
+        else:
+            student_number += BASE_OPTIONS_NUMBER[selected_option[0]]
+        student_number += "|"
+
+    print student_number
 
     return image_threshold_color
 
 def extractDateOfBirth(contours, image_threshold):
     """ extract information from vertical aligned bubble """
-    print 'extractDateOfBirth was called'
+    # print 'extractDateOfBirth was called'
 
     DATA_OPTIONS_LENGTHS = [4, 10, 2, 10, 10, 10]
 
@@ -169,13 +187,22 @@ def extractDateOfBirth(contours, image_threshold):
         image_threshold_color
     )
 
-    print selected_options
+    # print selected_options
+    date_of_birth = ""
+    for selected_option in selected_options:
+        if selected_option[0] == None:
+            date_of_birth += " "
+        else:
+            date_of_birth += BASE_OPTIONS_NUMBER[selected_option[0]]
+        date_of_birth += "|"
+
+    print date_of_birth
 
     return image_threshold_color
 
 def extractPackageNumber(contours, image_threshold):
     """ extract package number """
-    print 'extractPackageNumber was called'
+    # print 'extractPackageNumber was called'
     DATA_OPTIONS_LENGTH = 10
 
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
@@ -217,13 +244,21 @@ def extractPackageNumber(contours, image_threshold):
         image_threshold_color
     )
 
-    print selected_options
+    package_number = ""
+    for selected_option in selected_options:
+        if selected_option[0] == None:
+            package_number += " "
+        else:
+            package_number += BASE_OPTIONS_NUMBER[selected_option[0]]
+        package_number += "|"
+
+    print package_number + "|"
 
     return image_threshold_color
 
 def extractAnswerSheet(contours, image_threshold):
     """ extract answer sheet """
-    print "extractAnswerSheet was called"
+    # print "extractAnswerSheet was called"
     DATA_LENGTH = 5
     DATA_OPTIONS_LENGTH = 50
 
@@ -278,7 +313,15 @@ def extractAnswerSheet(contours, image_threshold):
         image_threshold_color
     )
 
-    print selected_options
+    answer = ""
+    for selected_option in selected_options:
+        if selected_option[0] == None:
+            answer += "-"
+        else:
+            answer += BASE_OPTIONS_ALPHABET[selected_option[0]]
+        answer += "|"
+
+    print answer
 
     return image_threshold_color
 
