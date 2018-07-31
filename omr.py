@@ -5,6 +5,7 @@ import argparse
 import cv2
 import imutils
 import numpy as np
+import mysql.connector
 from omrUtilities import findBlackBoxAnchor
 from omrUtilities import findDegreeBias
 from omrUtilities import rotateImage
@@ -25,10 +26,47 @@ def saveImage(path, image):
     """save image to disk"""
     cv2.imwrite(path, image)
 
+def connectDatabase():
+    tmp_data_con = mysql.connector.connect(
+      host="localhost",
+      user="root",
+      passwd="",
+      database="omr_grader"
+    )
+    return tmp_data_con
+
+def getMetaLik(data_conn, layout_name):
+    cursor = data_conn.cursor()
+    cursor.execute("SELECT * FROM meta_lik WHERE nama='" + layout_name + "'")
+
+    result = cursor.fetchall()
+    result = result[0]
+
+    cursor.execute("SELECT * FROM meta_lik_detail WHERE id_meta_lik='" + result[1] + "'")
+
+    meta_lik = []
+    result_metas = cursor.fetchall()
+
+    for result_meta in result_metas:
+        meta_lik.append([
+            (result_meta[3], result_meta[4]),
+            (result_meta[5], result_meta[6]),
+            result_meta[2]
+        ])
+
+    return meta_lik
+
 argument_parser = argparse.ArgumentParser()
 argument_parser.add_argument("-i", "--image", required=True, help="Path to the input directory")
+argument_parser.add_argument("-l", "--layout", required=True, help="layout name")
 
 arguments = vars(argument_parser.parse_args())
+
+layout_name = arguments['layout']
+data_connection = connectDatabase()
+meta_lik = getMetaLik(data_connection, layout_name)
+
+relative_points = meta_lik
 
 if not os.path.isdir(DIR_PROCESSING_RESULT):
     os.mkdir(DIR_PROCESSING_RESULT)
@@ -156,13 +194,13 @@ cv2.imwrite(
 # ]
 
 # 3 section 02
-relative_points = [
-    [(591, 488), (1345, 1386), 'NAME'],
-    [(79, 486), (538, 841), 'STUDENT_NUMBER'],
-    [(-9, 1416), (1418, 1832), 'ANSWER']
-]
+# relative_points = [
+#     [(591, 488), (1345, 1386), 'NAME'],
+#     [(79, 486), (538, 841), 'STUDENT_NUMBER'],
+#     [(-9, 1416), (1418, 1832), 'ANSWER']
+# ]
 
-# 4 section 01
+# 4 section 03
 # relative_points = [
 #     [(596, 921), (1351, 1816), 'NAME'],
 #     [(85, 916), (543, 1267), 'STUDENT_NUMBER'],
@@ -170,7 +208,7 @@ relative_points = [
 #     [(-11, 400), (1437, 808), 'ANSWER']
 # ]
 
-# 4 section 02
+# 4 section 04
 # relative_points = [
 #     [(596, 479), (1349, 1370), 'NAME'],
 #     [(86, 479), (538, 825), 'STUDENT_NUMBER'],
@@ -187,7 +225,7 @@ relative_points = [
 #     [(-1, 367), (1424, 762), 'ANSWER']
 # ]
 
-# 5 section 02
+# 5 section 06
 # relative_points = [
 #     [(600, 918), (1351, 1812), 'NAME'],
 #     [(81, 1423), (541, 1772), 'STUDENT_NUMBER'],
@@ -196,7 +234,7 @@ relative_points = [
 #     [(-1, 367), (1424, 762), 'ANSWER']
 # ]
 
-# 5 section 03
+# 5 section 07
 # relative_points = [
 #     [(598, 481), (1349, 1370), 'NAME'],
 #     [(88, 480), (538, 825), 'STUDENT_NUMBER'],

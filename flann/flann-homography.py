@@ -6,8 +6,8 @@ import cv2
 from matplotlib import pyplot as plt
 
 DIR_QUERY_IMAGE = os.path.abspath("logo_example")
-DIR_TRAIN_IMAGE = os.path.abspath("../sample/sample-w-logo")
-DIR_PROCESSING_RESULT = os.path.abspath("../processing_result")
+DIR_TRAIN_IMAGE = os.path.abspath("../sample/test-case/01/")
+DIR_PROCESSING_RESULT = os.path.abspath("../processing_result/flann")
 
 MIN_MATCH_COUNT = 50
 
@@ -18,7 +18,7 @@ print DIR_PROCESSING_RESULT
 image_query = cv2.imread(
     os.path.join(
         DIR_QUERY_IMAGE,
-        'logo-smk-imanuel-bg-white.png'
+        'logo-dikti-bg-white.png'
     ),
     0
 )
@@ -26,7 +26,7 @@ image_query = cv2.imread(
 image_train = cv2.imread(
     os.path.join(
         DIR_TRAIN_IMAGE,
-        'immanuel-3.png'
+        '001_normal.png'
     ),
     0
 )

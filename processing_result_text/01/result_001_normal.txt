@@ -1,3 +1,1 @@
-B|E|C|A|E|C|B|A|D|A|E|A|D|D|D|B|C|D|A|E|A|D|C|B|E|B|E|A|D|C|C|A|D|B|E|A|C|D|B|E|B|E|C|B|D|B|-|C|B|E|
-8|1|7|3|1|4|7|5|7|
-R|A|S|M|U|S| |L|E|R|D|O|R|F| | | | | | |
+A|B|C|D|E|E|D|C|B|A|E|D|C|B|A|A|B|C|D|E|A|B|C|B|A|E|D|C|D|E|A|B|C|D|C|A|B|B|A|B|A|A|B|B|C|C|A|D|E|E|2|1|0|1|8|1|9|3|6|G|A|N|H|I| |M|A|H|A|T|M|A| | | | | | | |

@@ -1,0 +1,56 @@
+01
+python omr.py -i sample/test-case/01/001_normal.png
+python omr.py -i sample/test-case/01/002_miring_kiri.png
+python omr.py -i sample/test-case/01/003_miring_kanan.png
+python omr.py -i sample/test-case/01/004_geser_bawah.png
+python omr.py -i sample/test-case/01/005_geser_atas.png
+python omr.py -i sample/test-case/01/006_terpotong_bawah.png
+python omr.py -i sample/test-case/01/007_terpotong_atas.png
+02
+python omr.py -i sample/test-case/02/001_normal.png
+python omr.py -i sample/test-case/02/002_miring_kiri.png
+python omr.py -i sample/test-case/02/003_miring_kanan.png
+python omr.py -i sample/test-case/02/004_geser_bawah.png
+python omr.py -i sample/test-case/02/005_geser_atas.png
+python omr.py -i sample/test-case/02/006_terpotong_bawah.png
+python omr.py -i sample/test-case/02/007_terpotong_atas.png
+03
+python omr.py -i sample/test-case/03/001_normal.png
+python omr.py -i sample/test-case/03/002_miring_kiri.png
+python omr.py -i sample/test-case/03/003_miring_kanan.png
+python omr.py -i sample/test-case/03/004_geser_bawah.png
+python omr.py -i sample/test-case/03/005_geser_atas.png
+python omr.py -i sample/test-case/03/006_terpotong_bawah.png
+python omr.py -i sample/test-case/03/007_terpotong_atas.png
+04
+python omr.py -i sample/test-case/04/001_normal.png
+python omr.py -i sample/test-case/04/002_miring_kiri.png
+python omr.py -i sample/test-case/04/003_miring_kanan.png
+python omr.py -i sample/test-case/04/004_geser_bawah.png
+python omr.py -i sample/test-case/04/005_geser_atas.png
+python omr.py -i sample/test-case/04/006_terpotong_bawah.png
+python omr.py -i sample/test-case/04/007_terpotong_atas.png
+05
+python omr.py -i sample/test-case/05/001_normal.png
+python omr.py -i sample/test-case/05/002_miring_kiri.png
+python omr.py -i sample/test-case/05/003_miring_kanan.png
+python omr.py -i sample/test-case/05/004_geser_bawah.png
+python omr.py -i sample/test-case/05/005_geser_atas.png
+python omr.py -i sample/test-case/05/006_terpotong_bawah.png
+python omr.py -i sample/test-case/05/007_terpotong_atas.png
+06
+python omr.py -i sample/test-case/06/001_normal.png
+python omr.py -i sample/test-case/06/002_miring_kiri.png
+python omr.py -i sample/test-case/06/003_miring_kanan.png
+python omr.py -i sample/test-case/06/004_geser_bawah.png
+python omr.py -i sample/test-case/06/005_geser_atas.png
+python omr.py -i sample/test-case/06/006_terpotong_bawah.png
+python omr.py -i sample/test-case/06/007_terpotong_atas.png
+07
+python omr.py -i sample/test-case/07/001_normal.png
+python omr.py -i sample/test-case/07/002_miring_kiri.png
+python omr.py -i sample/test-case/07/003_miring_kanan.png
+python omr.py -i sample/test-case/07/004_geser_bawah.png
+python omr.py -i sample/test-case/07/005_geser_atas.png
+python omr.py -i sample/test-case/07/006_terpotong_bawah.png
+python omr.py -i sample/test-case/07/007_terpotong_atas.png

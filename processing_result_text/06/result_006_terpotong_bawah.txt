@@ -1,0 +1,5 @@
+B|C|D|E|D|E|D|C|B|A|A|B|B|C|C|D|C|C|C|A|A|B|C|D|E|C|B|C|C|E|C|B|E|D|A|A|C|D|E|D|B|C|D|C|B|E|D|A|E|D|
+9|7|5|7|1|7|0|8| |
+0|8|0|1|4|2|
+U|T|E| |E| |E|Z|A|L|I|Z|G| |Y|U|Y| | |
+7|9||
