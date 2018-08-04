@@ -37,8 +37,7 @@ def findBlackBoxAnchor(contours, options):
 
     ordered_square_contours = imutils_contours.sort_contours(
         contours, method="top-to-bottom"
-    )
-    ordered_square_contours = ordered_square_contours[0]
+    )[0]
 
     for (j, tmp_contour) in enumerate(ordered_square_contours):
         (x, y, w, h) = cv2.boundingRect(tmp_contour)
@@ -86,9 +85,30 @@ def findBlackBoxAnchor(contours, options):
     # square_contours = np.array(square_contours)
 
     ordered_square_contours = imutils_contours.sort_contours(
-        square_contours, method="top-to-bottom"
-    )
-    ordered_square_contours = ordered_square_contours[0]
+        square_contours, method="left-to-right"
+    )[0]
+
+    left_square_contours = list()
+    left_square_contours.append(ordered_square_contours[0])
+    left_square_contours.append(ordered_square_contours[1])
+
+    ordered_left_square_contours = imutils_contours.sort_contours(
+        left_square_contours, method="top-to-bottom"
+    )[0]
+
+    right_square_contours = list()
+    right_square_contours.append(ordered_square_contours[2])
+    right_square_contours.append(ordered_square_contours[3])
+
+    ordered_right_square_contours = imutils_contours.sort_contours(
+        right_square_contours, method="top-to-bottom"
+    )[0]
+
+    ordered_square_contours = list()
+    ordered_square_contours.append(ordered_left_square_contours[0])
+    ordered_square_contours.append(ordered_right_square_contours[0])
+    ordered_square_contours.append(ordered_left_square_contours[1])
+    ordered_square_contours.append(ordered_right_square_contours[1])
 
     index = 1
     for tmp_contour in ordered_square_contours:
@@ -123,6 +143,13 @@ def findBlackBoxAnchor(contours, options):
 
 def findDegreeBias(square_box_contours):
     """ find degree bias on the paper """
+    (x1, y1, w, h) = cv2.boundingRect(square_box_contours[0])
+    (x2, y2, w, h) = cv2.boundingRect(square_box_contours[1])
+
+    rotate_inverse = False
+    if y1 > y2:
+        rotate_inverse = True
+
     rect_sb_1 = cv2.minAreaRect(square_box_contours[0])
     box_1 = np.int0(cv2.boxPoints(rect_sb_1))
 
@@ -144,8 +171,11 @@ def findDegreeBias(square_box_contours):
     rads %= 2*pi
     degs = degrees(rads)
 
-    if degs > 90:
-        degs -= 180
+    if not rotate_inverse:
+        if degs > 90:
+            degs -= 180
+    else:
+        degs -= 360
 
     rotation_center = (x1, y1)
     rotation_matrix = findRotationMatrix(rotation_center, degs)
