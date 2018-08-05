@@ -30,6 +30,7 @@ DEFAULT_CIRCLE_MAX_HEIGHT = 40
 def findCircle(image, options):
     """ find contour that listed as circle """
     image_copy = image.copy()
+    image_copy_2 = image.copy()
     image_copy = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
     image_name = options['image_name']
 
@@ -45,6 +46,8 @@ def findCircle(image, options):
 
     for (index, tmp_contour) in enumerate(contours):
         (x, y, w, h) = cv2.boundingRect(tmp_contour)
+        (x_circle, y_circle), radius = cv2.minEnclosingCircle(tmp_contour)
+        radius = int(radius)
 
         point = (tmp_contour[0][0][0], tmp_contour[0][0][1])
 
@@ -57,6 +60,7 @@ def findCircle(image, options):
             )
 
         image_copy = cv2.drawContours(image_copy, [tmp_contour], -1, 255, -1)
+        cv2.circle(image_copy_2, (int(x_circle), int(y_circle)), int(radius), 255, 1)
 
         cv2.putText(image_copy, str(h),
                     point, cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
@@ -67,6 +71,14 @@ def findCircle(image, options):
             'threshold_with_contour' + image_name + '.png'
         ),
         image_copy
+    )
+
+    cv2.imwrite(
+        os.path.join(
+            DIR_PROCESSING_RESULT,
+            'threshold_with_contour_circle' + image_name + '.png'
+        ),
+        image_copy_2
     )
 
     return populated_contours
@@ -130,6 +142,9 @@ def extractCircledBubble(populated_contours, image, options):
         (255, 0, 255)
     ]
 
+    database_connection = options['database_connection']
+    ekstraksi_id = options['ekstraksi_id']
+
     image_name = options['image_name']
     image_color = image.copy()
     image_color = cv2.cvtColor(image_color, cv2.COLOR_GRAY2RGB)
@@ -137,24 +152,25 @@ def extractCircledBubble(populated_contours, image, options):
     # populated_contours = sortPopulatedContours(populated_contours, image)
     # print populated_contours
     image_checker = image_color.copy()
+    cursor = database_connection.cursor()
     for (j, index) in enumerate(populated_contours):
         populated_contour = populated_contours[index]
 
         if index == 'NAME':
             contours = sortLeftToRightContours(populated_contour['contours'])
-            image_checker = extractName(contours, image_checker)
+            image_checker = extractName(contours, image_checker, cursor, ekstraksi_id)
         elif index == 'STUDENT_NUMBER':
             contours = sortLeftToRightContours(populated_contour['contours'])
-            image_checker = extractStudentNumber(contours, image_checker)
+            image_checker = extractStudentNumber(contours, image_checker, cursor, ekstraksi_id)
         elif index == 'DATE_OF_BIRTH':
             contours = sortLeftToRightContours(populated_contour['contours'])
-            image_checker = extractDateOfBirth(contours, image_checker)
+            image_checker = extractDateOfBirth(contours, image_checker, cursor, ekstraksi_id)
         elif index == 'PACKAGE_NUMBER':
             contours = sortLeftToRightContours(populated_contour['contours'])
-            image_checker = extractPackageNumber(contours, image_checker)
+            image_checker = extractPackageNumber(contours, image_checker, cursor, ekstraksi_id)
         elif index == 'ANSWER':
             contours = populated_contour['contours']
-            image_checker = extractAnswerSheet(contours, image_checker)
+            image_checker = extractAnswerSheet(contours, image_checker, cursor, ekstraksi_id)
 
         for contour in populated_contour['contours']:
             image_color = cv2.drawContours(image_color, [contour], -1, color[j], -1)

@@ -88,27 +88,28 @@ def findBlackBoxAnchor(contours, options):
         square_contours, method="left-to-right"
     )[0]
 
-    left_square_contours = list()
-    left_square_contours.append(ordered_square_contours[0])
-    left_square_contours.append(ordered_square_contours[1])
+    if (len(ordered_square_contours) == 4):
+        left_square_contours = list()
+        left_square_contours.append(ordered_square_contours[0])
+        left_square_contours.append(ordered_square_contours[1])
 
-    ordered_left_square_contours = imutils_contours.sort_contours(
-        left_square_contours, method="top-to-bottom"
-    )[0]
+        ordered_left_square_contours = imutils_contours.sort_contours(
+            left_square_contours, method="top-to-bottom"
+        )[0]
 
-    right_square_contours = list()
-    right_square_contours.append(ordered_square_contours[2])
-    right_square_contours.append(ordered_square_contours[3])
+        right_square_contours = list()
+        right_square_contours.append(ordered_square_contours[2])
+        right_square_contours.append(ordered_square_contours[3])
 
-    ordered_right_square_contours = imutils_contours.sort_contours(
-        right_square_contours, method="top-to-bottom"
-    )[0]
+        ordered_right_square_contours = imutils_contours.sort_contours(
+            right_square_contours, method="top-to-bottom"
+        )[0]
 
-    ordered_square_contours = list()
-    ordered_square_contours.append(ordered_left_square_contours[0])
-    ordered_square_contours.append(ordered_right_square_contours[0])
-    ordered_square_contours.append(ordered_left_square_contours[1])
-    ordered_square_contours.append(ordered_right_square_contours[1])
+        ordered_square_contours = list()
+        ordered_square_contours.append(ordered_left_square_contours[0])
+        ordered_square_contours.append(ordered_right_square_contours[0])
+        ordered_square_contours.append(ordered_left_square_contours[1])
+        ordered_square_contours.append(ordered_right_square_contours[1])
 
     index = 1
     for tmp_contour in ordered_square_contours:

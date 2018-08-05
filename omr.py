@@ -6,6 +6,9 @@ import cv2
 import imutils
 import numpy as np
 import mysql.connector
+
+from time import gmtime, strftime
+
 from omrUtilities import findBlackBoxAnchor
 from omrUtilities import findDegreeBias
 from omrUtilities import rotateImage
@@ -27,6 +30,7 @@ def saveImage(path, image):
     cv2.imwrite(path, image)
 
 def connectDatabase():
+    """ connect to database """
     tmp_data_con = mysql.connector.connect(
       host="localhost",
       user="root",
@@ -36,6 +40,7 @@ def connectDatabase():
     return tmp_data_con
 
 def getMetaLik(data_conn, layout_name):
+    """ get meta data """
     cursor = data_conn.cursor()
     cursor.execute("SELECT * FROM meta_lik WHERE nama='" + layout_name + "'")
 
@@ -53,6 +58,8 @@ def getMetaLik(data_conn, layout_name):
             (result_meta[5], result_meta[6]),
             result_meta[2]
         ])
+
+    cursor.close()
 
     return meta_lik
 
@@ -87,20 +94,37 @@ image_omr_sheet_edged = cv2.Canny(image_omr_sheet_blurred, 100, 200)
 image_omr_sheet_thresh = cv2.threshold(image_omr_sheet_gray, 0, 255,
                                        cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
+
+# kernel = np.ones((1,1), np.uint8)
+# opening = cv2.morphologyEx(image_omr_sheet_edged, cv2.MORPH_OPEN, kernel)
+# path_gray = createPath(
+#     DIR_PROCESSING_RESULT,
+#     '___OPENING-' + image_name + IMAGE_EXTENSION
+# )
+# saveImage(path_gray, opening)
+
 kernel = np.ones((2,2), np.uint8)
 image_test_dilate = image_omr_sheet_thresh.copy()
 dilation = cv2.dilate(image_test_dilate, kernel, iterations = 1)
+# kernel = np.ones((2,2), np.uint8)
+# dilation = cv2.erode(dilation, kernel, iterations = 2)
+
 path_gray = createPath(
     DIR_PROCESSING_RESULT,
     'IMAGE_DILATE-' + image_name + IMAGE_EXTENSION
 )
 saveImage(path_gray, dilation)
 
-path_gray = createPath(
-    DIR_PROCESSING_RESULT,
-    'IMAGE_OMR_SHEET_THRESHOLD-' + image_name + IMAGE_EXTENSION
-)
-saveImage(path_gray, image_omr_sheet_thresh)
+# kernel = np.ones((1,2), np.uint8)
+# image_opening_dilate = opening.copy()
+# image_opening_dilate = cv2.dilate(image_opening_dilate, kernel, iterations = 2)
+# path_gray = createPath(
+#     DIR_PROCESSING_RESULT,
+#     '__OPENING-DILATION-' + image_name + IMAGE_EXTENSION
+# )
+# saveImage(path_gray, image_opening_dilate)
+# dilation = image_opening_dilate.copy()
+# dilation = image_omr_sheet_edged.copy()
 
 image_omr_with_contour = image_omr_sheet.copy()
 contours = cv2.findContours(image_omr_sheet_thresh, cv2.RETR_EXTERNAL,
@@ -253,10 +277,24 @@ populated_contour = findCircle(
     }
 )
 
+# create extraction record
+cursor = data_connection.cursor()
+now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+query = "INSERT INTO ekstraksi (id_gambar, created_at) VALUE(%s, %s)"
+value = ("1", now)
+cursor.execute(query, value)
+
+ekstraksi_id = cursor.lastrowid
+
 extractCircledBubble(
     populated_contour,
     rotated_threshold_image,
     {
-        'image_name': image_name
+        'image_name': image_name,
+        'database_connection': data_connection,
+        'ekstraksi_id': ekstraksi_id
     }
 )
+
+data_connection.commit()
+data_connection.close()

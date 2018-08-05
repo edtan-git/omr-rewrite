@@ -4,6 +4,7 @@ import datetime
 import cv2
 import numpy as np
 import imutils
+from time import gmtime, strftime
 
 DIR_PROCESSING_RESULT = 'processing_result'
 BASE_OPTIONS_ALPHABET = [
@@ -23,7 +24,11 @@ COLOR = [
     (255, 0, 255)
 ]
 
-def extractName(contours, image_threshold):
+def getNow():
+    now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    return now
+
+def extractName(contours, image_threshold, cursor, ekstraksi_id):
     """ extract information from vertical aligned bubble """
     # print 'extractName was called'
     DATA_OPTIONS_LENGTH = 26
@@ -32,12 +37,22 @@ def extractName(contours, image_threshold):
     image_threshold_color = image_threshold.copy()
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
+    now = getNow()
+    query = "INSERT INTO pilihan_nama (id_ekstraksi, index_pilihan, created_at) value(%s, %s, %s)"
+    query_detail = "INSERT INTO pilihan_nama_detail (id_pilihan_nama, index_opsi_terpilih, created_at) value(%s, %s, %s)"
+    index_pilihan = 1
+
     selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
+
+        value = (str(ekstraksi_id), str(index_pilihan), now)
+        cursor.execute(query, value)
+        pilihan_nama_id = cursor.lastrowid
+        index_pilihan += 1
 
         selected_options.append(list())
         tmp_selected_values = list()
@@ -53,6 +68,10 @@ def extractName(contours, image_threshold):
                     'tmp_selected_values': tmp_selected_values
                 }
             )
+
+            if not return_check_contour['selected_value'] == None:
+                value_detail = (str(pilihan_nama_id), str(return_check_contour['selected_value']), now)
+                cursor.execute(query_detail, value_detail)
 
             tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
@@ -81,7 +100,7 @@ def extractName(contours, image_threshold):
 
     return image_threshold_color
 
-def extractStudentNumber(contours, image_threshold):
+def extractStudentNumber(contours, image_threshold, cursor, ekstraksi_id):
     """ extract student number """
     # print 'extractStudentNumber was called'
     DATA_OPTIONS_LENGTH = 10
@@ -90,12 +109,22 @@ def extractStudentNumber(contours, image_threshold):
     image_threshold_color = image_threshold.copy()
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
+    now = getNow()
+    query = "INSERT INTO pilihan_nomor_siswa (id_ekstraksi, index_pilihan, created_at) value(%s, %s, %s)"
+    query_detail = "INSERT INTO pilihan_nomor_siswa_detail (id_pilihan_nomor_siswa, index_opsi_terpilih, created_at) value(%s, %s, %s)"
+
+    index_pilihan = 1
     selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
+
+        value = (str(ekstraksi_id), str(index_pilihan), now)
+        cursor.execute(query, value)
+        pilihan_nomor_siswa_id = cursor.lastrowid
+        index_pilihan += 1
 
         selected_options.append(list())
         tmp_selected_values = list()
@@ -111,6 +140,10 @@ def extractStudentNumber(contours, image_threshold):
                     'tmp_selected_values': tmp_selected_values
                 }
             )
+
+            if not return_check_contour['selected_value'] == None:
+                value_detail = (str(pilihan_nomor_siswa_id), str(return_check_contour['selected_value']), now)
+                cursor.execute(query_detail, value_detail)
 
             tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
@@ -137,7 +170,7 @@ def extractStudentNumber(contours, image_threshold):
 
     return image_threshold_color
 
-def extractDateOfBirth(contours, image_threshold):
+def extractDateOfBirth(contours, image_threshold, cursor, ekstraksi_id):
     """ extract information from vertical aligned bubble """
     # print 'extractDateOfBirth was called'
 
@@ -146,6 +179,10 @@ def extractDateOfBirth(contours, image_threshold):
     # image_threshold_color = cv2.cvtColor(image_threshold.copy(), cv2.COLOR_GRAY2RGB)
     image_threshold_color = image_threshold.copy()
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
+
+    now = getNow()
+    query = "INSERT INTO pilihan_nama (id_ekstraksi, index_pilihan, created_at) value(%s, %s, %s)"
+    query_detail = "INSERT INTO pilihan_nama_detail (id_pilihan_nama, index_opsi_terpilih, created_at) value(%s, %s, %s)"
 
     start = 0
     selected_options = list()
@@ -158,6 +195,12 @@ def extractDateOfBirth(contours, image_threshold):
             process_contours,
             method="top-to-bottom"
         )[0]
+
+        pilihan_nama = 0
+        value = (str(ekstraksi_id), str(pilihan_nama), now)
+        cursor.execute(query, value)
+        pilihan_nama_id = cursor.lastrowid
+        pilihan_nama += 1
 
         selected_options.append(list())
         tmp_selected_values = list()
@@ -173,6 +216,10 @@ def extractDateOfBirth(contours, image_threshold):
                     'tmp_selected_values': tmp_selected_values
                 }
             )
+
+            if not return_check_contour['selected_value'] == None:
+                value_detail = (str(pilihan_nama_id), str(return_check_contour['selected_value']), now)
+                cursor.execute(query_detail, value_detail)
 
             tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
@@ -200,7 +247,7 @@ def extractDateOfBirth(contours, image_threshold):
 
     return image_threshold_color
 
-def extractPackageNumber(contours, image_threshold):
+def extractPackageNumber(contours, image_threshold, cursor, ekstraksi_id):
     """ extract package number """
     # print 'extractPackageNumber was called'
     DATA_OPTIONS_LENGTH = 10
@@ -256,7 +303,7 @@ def extractPackageNumber(contours, image_threshold):
 
     return image_threshold_color
 
-def extractAnswerSheet(contours, image_threshold):
+def extractAnswerSheet(contours, image_threshold, cursor, ekstraksi_id):
     """ extract answer sheet """
     # print "extractAnswerSheet was called"
     DATA_LENGTH = 5
@@ -271,19 +318,28 @@ def extractAnswerSheet(contours, image_threshold):
         method="left-to-right"
     )[0]
 
+    now = getNow()
+    query = "INSERT INTO pilihan_jawaban (id_ekstraksi, nomor_soal, created_at) value(%s, %s, %s)"
+    query_detail = "INSERT INTO pilihan_jawaban_detail (id_pilihan_jawaban, index_opsi_terpilih, created_at) value(%s, %s, %s)"
     selected_options = list()
     tmp_result = list()
+    nomor_pilihan_jawaban = 1
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
 
+        pilihan_jawaban = 0
         for (r, j) in enumerate(np.arange(0, len(tmp_contours), DATA_LENGTH)):
             tmp_answer_contours = imutils.contours.sort_contours(
                 tmp_contours[j:j+DATA_LENGTH],
                 method="left-to-right"
             )[0]
+
+            value = (str(ekstraksi_id), str(nomor_pilihan_jawaban), now)
+            cursor.execute(query, value)
+            pilihan_jawaban_id = cursor.lastrowid
 
             selected_options.append(list())
             tmp_selected_values = list()
@@ -300,10 +356,15 @@ def extractAnswerSheet(contours, image_threshold):
                     }
                 )
 
+                if not return_check_contour['selected_value'] == None:
+                    value_detail = (str(pilihan_jawaban_id), str(return_check_contour['selected_value']), now)
+                    cursor.execute(query_detail, value_detail)
+
                 tmp_selected_values = return_check_contour['tmp_selected_values']
                 image_threshold_color = return_check_contour['image_threshold_color']
 
             selected_options[len(selected_options) - 1] = tmp_selected_values
+            nomor_pilihan_jawaban = nomor_pilihan_jawaban + 1
 
     cv2.imwrite(
         os.path.join(
@@ -340,11 +401,12 @@ def checkIfContourSelected(image_threshold, image_threshold_color, contour, sele
 
     mask = cv2.bitwise_and(image_threshold, image_threshold, mask=mask)
     total = cv2.countNonZero(mask)
-    total_area = cv2.contourArea(contour)
+    (x_cirlce, y_circle), radius = cv2.minEnclosingCircle(contour)
+    total_area = 3.14 * radius * radius
 
     percentage_covered = total / total_area
 
-    if percentage_covered > 0.9:
+    if percentage_covered > 0.88:
         selected = True
 
         image_threshold_color = cv2.putText(
