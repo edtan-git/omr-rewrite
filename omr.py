@@ -6,8 +6,9 @@ import cv2
 import imutils
 import numpy as np
 import mysql.connector
+import json
 
-from time import gmtime, strftime
+from time import gmtime, strftime, localtime
 
 from omrUtilities import findBlackBoxAnchor
 from omrUtilities import findDegreeBias
@@ -66,12 +67,14 @@ def getMetaLik(data_conn, layout_name):
 argument_parser = argparse.ArgumentParser()
 argument_parser.add_argument("-i", "--image", required=True, help="Path to the input directory")
 argument_parser.add_argument("-l", "--layout", required=True, help="layout name")
+argument_parser.add_argument("-gambarid", "--gambarid", required=True, help="Gambar id")
 
 arguments = vars(argument_parser.parse_args())
 
 layout_name = arguments['layout']
 data_connection = connectDatabase()
 meta_lik = getMetaLik(data_connection, layout_name)
+gambar_id = arguments['gambarid']
 
 relative_points = meta_lik
 
@@ -175,10 +178,11 @@ return_black_box_anchor = findBlackBoxAnchor(contours, options)
 ordered_square_boxes = return_black_box_anchor['ordered_square_contours']
 square_attributes = return_black_box_anchor['square_attributes']
 degree_bias = findDegreeBias(ordered_square_boxes)
-rotated_image = rotateImage(image_omr_sheet,
-                            degree_bias['rotation_matrix'],
-                            {'image_name': image_name}
-                           )
+rotated_image = rotateImage(
+    image_omr_sheet,
+    degree_bias['rotation_matrix'],
+    {'image_name': image_name}
+)
 
 image_omr_sheet_thresh = dilation.copy()
 rotated_threshold_image = rotateImage(
@@ -279,9 +283,9 @@ populated_contour = findCircle(
 
 # create extraction record
 cursor = data_connection.cursor()
-now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+now = strftime("%Y-%m-%d %H:%M:%S", localtime())
 query = "INSERT INTO ekstraksi (id_gambar, created_at) VALUE(%s, %s)"
-value = ("1", now)
+value = (gambar_id, now)
 cursor.execute(query, value)
 
 ekstraksi_id = cursor.lastrowid
@@ -295,6 +299,8 @@ extractCircledBubble(
         'ekstraksi_id': ekstraksi_id
     }
 )
+
+print json.dumps({'id_ekstraksi': ekstraksi_id})
 
 data_connection.commit()
 data_connection.close()

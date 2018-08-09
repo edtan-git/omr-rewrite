@@ -6,6 +6,7 @@ import numpy as np
 import imutils
 from time import gmtime, strftime
 
+PRINT_RESULT = False
 DIR_PROCESSING_RESULT = 'processing_result'
 BASE_OPTIONS_ALPHABET = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
@@ -70,6 +71,7 @@ def extractName(contours, image_threshold, cursor, ekstraksi_id):
             )
 
             if not return_check_contour['selected_value'] == None:
+                # print str(return_check_contour['selected_value'])
                 value_detail = (str(pilihan_nama_id), str(return_check_contour['selected_value']), now)
                 cursor.execute(query_detail, value_detail)
 
@@ -88,15 +90,16 @@ def extractName(contours, image_threshold, cursor, ekstraksi_id):
 
     # print selected_options
 
-    name = ""
-    for selected_option in selected_options:
-        if selected_option[0] == None:
-            name += " "
-        else:
-            name += BASE_OPTIONS_ALPHABET[selected_option[0]]
-        name += "|"
+    if PRINT_RESULT:
+        name = ""
+        for selected_option in selected_options:
+            if selected_option[0] == None:
+                name += " "
+            else:
+                name += BASE_OPTIONS_ALPHABET[selected_option[0]]
+            name += "|"
 
-    print name
+        print name
 
     return image_threshold_color
 
@@ -158,15 +161,16 @@ def extractStudentNumber(contours, image_threshold, cursor, ekstraksi_id):
         image_threshold_color
     )
 
-    student_number = ""
-    for selected_option in selected_options:
-        if selected_option[0] == None:
-            student_number += " "
-        else:
-            student_number += BASE_OPTIONS_NUMBER[selected_option[0]]
-        student_number += "|"
+    if PRINT_RESULT:
+        student_number = ""
+        for selected_option in selected_options:
+            if selected_option[0] == None:
+                student_number += " "
+            else:
+                student_number += BASE_OPTIONS_NUMBER[selected_option[0]]
+            student_number += "|"
 
-    print student_number
+        print student_number
 
     return image_threshold_color
 
@@ -181,8 +185,9 @@ def extractDateOfBirth(contours, image_threshold, cursor, ekstraksi_id):
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
     now = getNow()
-    query = "INSERT INTO pilihan_nama (id_ekstraksi, index_pilihan, created_at) value(%s, %s, %s)"
-    query_detail = "INSERT INTO pilihan_nama_detail (id_pilihan_nama, index_opsi_terpilih, created_at) value(%s, %s, %s)"
+    query = "INSERT INTO pilihan_tanggal_lahir (id_ekstraksi, index_pilihan, created_at) value(%s, %s, %s)"
+    query_detail = "INSERT INTO pilihan_tanggal_lahir_detail (id_pilihan_tanggal_lahir, index_opsi_terpilih, created_at) value(%s, %s, %s)"
+    pilihan_tanggal_lahir = 0
 
     start = 0
     selected_options = list()
@@ -196,11 +201,10 @@ def extractDateOfBirth(contours, image_threshold, cursor, ekstraksi_id):
             method="top-to-bottom"
         )[0]
 
-        pilihan_nama = 0
-        value = (str(ekstraksi_id), str(pilihan_nama), now)
+        value = (str(ekstraksi_id), str(pilihan_tanggal_lahir), now)
         cursor.execute(query, value)
-        pilihan_nama_id = cursor.lastrowid
-        pilihan_nama += 1
+        pilihan_tanggal_lahir_id = cursor.lastrowid
+        pilihan_tanggal_lahir += 1
 
         selected_options.append(list())
         tmp_selected_values = list()
@@ -218,7 +222,7 @@ def extractDateOfBirth(contours, image_threshold, cursor, ekstraksi_id):
             )
 
             if not return_check_contour['selected_value'] == None:
-                value_detail = (str(pilihan_nama_id), str(return_check_contour['selected_value']), now)
+                value_detail = (str(pilihan_tanggal_lahir_id), str(return_check_contour['selected_value']), now)
                 cursor.execute(query_detail, value_detail)
 
             tmp_selected_values = return_check_contour['tmp_selected_values']
@@ -235,15 +239,16 @@ def extractDateOfBirth(contours, image_threshold, cursor, ekstraksi_id):
     )
 
     # print selected_options
-    date_of_birth = ""
-    for selected_option in selected_options:
-        if selected_option[0] == None:
-            date_of_birth += " "
-        else:
-            date_of_birth += BASE_OPTIONS_NUMBER[selected_option[0]]
-        date_of_birth += "|"
+    if PRINT_RESULT:
+        date_of_birth = ""
+        for selected_option in selected_options:
+            if selected_option[0] == None:
+                date_of_birth += " "
+            else:
+                date_of_birth += BASE_OPTIONS_NUMBER[selected_option[0]]
+            date_of_birth += "|"
 
-    print date_of_birth
+        print date_of_birth
 
     return image_threshold_color
 
@@ -291,15 +296,16 @@ def extractPackageNumber(contours, image_threshold, cursor, ekstraksi_id):
         image_threshold_color
     )
 
-    package_number = ""
-    for selected_option in selected_options:
-        if selected_option[0] == None:
-            package_number += " "
-        else:
-            package_number += BASE_OPTIONS_NUMBER[selected_option[0]]
-        package_number += "|"
+    if PRINT_RESULT:
+        package_number = ""
+        for selected_option in selected_options:
+            if selected_option[0] == None:
+                package_number += " "
+            else:
+                package_number += BASE_OPTIONS_NUMBER[selected_option[0]]
+            package_number += "|"
 
-    print package_number + "|"
+        print package_number + "|"
 
     return image_threshold_color
 
@@ -374,15 +380,16 @@ def extractAnswerSheet(contours, image_threshold, cursor, ekstraksi_id):
         image_threshold_color
     )
 
-    answer = ""
-    for selected_option in selected_options:
-        if selected_option[0] == None:
-            answer += "-"
-        else:
-            answer += BASE_OPTIONS_ALPHABET[selected_option[0]]
-        answer += "|"
+    if PRINT_RESULT:
+        answer = ""
+        for selected_option in selected_options:
+            if selected_option[0] == None:
+                answer += "-"
+            else:
+                answer += BASE_OPTIONS_ALPHABET[selected_option[0]]
+            answer += "|"
 
-    print answer
+        print answer
 
     return image_threshold_color
 
