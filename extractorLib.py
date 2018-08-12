@@ -4,6 +4,8 @@ import datetime
 import cv2
 import numpy as np
 import imutils
+import math
+
 from time import gmtime, strftime
 
 PRINT_RESULT = False
@@ -261,12 +263,22 @@ def extractPackageNumber(contours, image_threshold, cursor, ekstraksi_id):
     image_threshold_color = image_threshold.copy()
     image_threshold = cv2.cvtColor(image_threshold, cv2.COLOR_BGR2GRAY)
 
+    now = getNow()
+    query = "INSERT INTO pilihan_paket_soal (id_ekstraksi, index_pilihan, created_at) value(%s, %s, %s)"
+    query_detail = "INSERT INTO pilihan_paket_soal_detail (id_pilihan_paket_soal, index_opsi_terpilih, created_at) value(%s, %s, %s)"
+    pilihan_paket_soal = 0
+
     selected_options = list()
     for (q, i) in enumerate(np.arange(0, len(contours), DATA_OPTIONS_LENGTH)):
         tmp_contours = imutils.contours.sort_contours(
             contours[i:i+DATA_OPTIONS_LENGTH],
             method="top-to-bottom"
         )[0]
+
+        value = (str(ekstraksi_id), str(pilihan_paket_soal), now)
+        cursor.execute(query, value)
+        pilihan_paket_soal_id = cursor.lastrowid
+        pilihan_paket_soal += 1
 
         selected_options.append(list())
         tmp_selected_values = list()
@@ -283,6 +295,9 @@ def extractPackageNumber(contours, image_threshold, cursor, ekstraksi_id):
                 }
             )
 
+            if not return_check_contour['selected_value'] == None:
+                value_detail = (str(pilihan_paket_soal_id), str(return_check_contour['selected_value']), now)
+                cursor.execute(query_detail, value_detail)
             tmp_selected_values = return_check_contour['tmp_selected_values']
             image_threshold_color = return_check_contour['image_threshold_color']
 
@@ -413,7 +428,7 @@ def checkIfContourSelected(image_threshold, image_threshold_color, contour, sele
 
     percentage_covered = total / total_area
 
-    if percentage_covered > 0.88:
+    if percentage_covered > 0.8:
         selected = True
 
         image_threshold_color = cv2.putText(
@@ -431,6 +446,16 @@ def checkIfContourSelected(image_threshold, image_threshold_color, contour, sele
             -1,
             (0, 255, 0),
             -1
+        )
+    else:
+        image_threshold_color = cv2.putText(
+            image_threshold_color,
+            str(math.ceil(percentage_covered*100)/100),
+            (x, y),
+            cv2.FONT_HERSHEY_COMPLEX,
+            0.5,
+            (0, 0, 255),
+            1
         )
 
     selected_value = None
